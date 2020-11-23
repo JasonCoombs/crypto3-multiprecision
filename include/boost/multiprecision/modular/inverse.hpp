@@ -46,12 +46,11 @@ Backend eval_extended_euclidean_algorithm(Backend& a, Backend& b, Backend& x, Ba
 template <typename Backend>
 Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backend& m)
 {
-   Backend                                                             aa = a, mm = m, x, y, g;
+   Backend aa = a, mm = m, x, y, g;
    typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
    g = eval_extended_euclidean_algorithm(aa, mm, x, y);
    if (!eval_eq(g, ui_type(1u)))
    {
-      //BOOST_THROW_EXCEPTION(std::invalid_argument("eval_inverse_with_gcd: no inverse element"));
       return ui_type(0u);
    }
    else
@@ -63,11 +62,18 @@ Backend eval_inverse_extended_euclidean_algorithm(const Backend& a, const Backen
    }
 }
 
+
 template <typename Backend>
 typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typename mpl::front<typename Backend::signed_types>::type a)
 {
    typedef typename mpl::front<typename Backend::signed_types>::type si_type;
 
+   return eval_monty_inverse<si_type>(a);
+}
+
+template <typename T>
+T eval_monty_inverse(T a)
+{
    if (a % 2 == 0)
    {
       throw std::invalid_argument("monty_inverse only valid for odd integers");
@@ -78,21 +84,21 @@ typename mpl::front<typename Backend::signed_types>::type eval_monty_inverse(typ
     * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
     */
 
-   si_type b = 1;
-   si_type r = 0;
+   T b = 1;
+   T r = 0;
 
-   for (size_t i = 0; i != sizeof(si_type) * CHAR_BIT; ++i)
+   for (size_t i = 0; i != sizeof(T) * CHAR_BIT; ++i)
    {
-      const si_type bi = b % 2;
+      const T bi = b % 2;
       r >>= 1;
-      r += bi << (sizeof(si_type) * CHAR_BIT - 1);
+      r += bi << (sizeof(T) * CHAR_BIT - 1);
 
       b -= a * bi;
       b >>= 1;
    }
 
    // Now invert in addition space
-   r = (~static_cast<si_type>(0) - r) + 1;
+   r = (~static_cast<T>(0) - r) + 1;
 
    return r;
 }
