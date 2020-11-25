@@ -52,6 +52,31 @@ number<Backend, ExpressionTemplates> monty_inverse(const number<Backend, Express
    return res;
 }
 
+template <typename Backend, expression_template_option ExpressionTemplates>
+number<Backend, ExpressionTemplates> inverse_mod_pow2(
+    const number<Backend, ExpressionTemplates>& a1, size_t k)
+{
+   return number<Backend, ExpressionTemplates>(
+       eval_inverse_mod_pow2(a1.backend(), k));
+}
+
+template <typename Backend, expression_template_option ExpressionTemplates>
+std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&       result,
+                                      const number<Backend, ExpressionTemplates>& a,
+                                      const number<Backend, ExpressionTemplates>& p)
+{
+   return eval_almost_montgomery_inverse(result.backend(), a.backend(), p.backend());
+}
+
+template <typename Backend, expression_template_option ExpressionTemplates>
+number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
+    const number<Backend, ExpressionTemplates>& a,
+    const number<Backend, ExpressionTemplates>& p)
+{
+   return number<Backend, ExpressionTemplates>(
+       evaL_normalized_montgomery_inverse(a.backned(), p.backend()));
+}
+
 /*
 template <typename IntegerType, typename = typename enable_if<typename is_trivial_cpp_int<IntegerType>::value>::type>
 IntegerType monty_inverse(const IntegerType& a)

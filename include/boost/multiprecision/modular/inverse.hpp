@@ -449,7 +449,6 @@ void inverse_mod_odd_modulus(number<Backend, ExpressionTemplates>&       res,
 }
  */
 
-/*
 template <typename Backend>
 std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
                                            const Backend& p)
@@ -499,19 +498,7 @@ std::size_t eval_almost_montgomery_inverse(Backend& result, const Backend& a,
 
    return k;
 }
-*/
 
-/*
-template <typename Backend, expression_template_option ExpressionTemplates>
-std::size_t almost_montgomery_inverse(number<Backend, ExpressionTemplates>&       result,
-                                      const number<Backend, ExpressionTemplates>& a,
-                                      const number<Backend, ExpressionTemplates>& p)
-{
-   return eval_almost_montgomery_inverse(result.backend(), a.backend(), p.backend());
-}
-*/
-
-/*
 template <typename Backend>
 Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
 {
@@ -529,20 +516,7 @@ Backend eval_normalized_montgomery_inverse(const Backend& a, const Backend& p)
 
    return r;
 }
-*/
 
-/*
-template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> normalized_montgomery_inverse(
-    const number<Backend, ExpressionTemplates>& a,
-    const number<Backend, ExpressionTemplates>& p)
-{
-   return number<Backend, ExpressionTemplates>(
-       evaL_normalized_montgomery_inverse(a.backned(), p.backend()));
-}
- */
-
-/*
 template <typename Backend>
 Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
 {
@@ -551,53 +525,26 @@ Backend eval_inverse_mod_pow2(Backend& a1, size_t k)
    * From "A New Algorithm for Inversion mod p^k" by Çetin Kaya Koç
    * https://eprint.iacr.org/2017/411.pdf sections 5 and 7.
    */
-/*
+
    if (eval_integer_modulus(a1, 2) == 0)
       return 0;
 
-   Backend a = a1;
-   eval_bit_set(a, k);
+   Backend b0 = 1, xi, bi, x = 0, a_xi;
 
-   Backend b = 1, X = 0, newb;
-
-   const std::size_t a_words = a.sig_words();
-
-   X.grow_to(round_up(k, sizeof(ui_type) * CHAR_BIT) / sizeof(ui_type) * CHAR_BIT);
-   b.grow_to(a_words);
-
-   /*
-   Hide the exact value of k. k is anyway known to word length
-   granularity because of the length of a, so no point in doing more
-   than this.
-   */
-/*
-
-   const std::size_t iter = round_up(k, sizeof(ui_type) * CHAR_BIT);
-
-   for (std::size_t i = 0; i != iter; ++i)
+   for (std::size_t i = 0; i != k; ++i)
    {
-      const bool b0 = eval_bit_test(b, 0);
-      X.conditionally_set_bit(i, b0);
-      newb = b;
-      eval_subtract(newb, a);
-      b.ct_cond_assign(b0, newb);
-      eval_right_shift(b, 1);
+      bi = b0;
+      eval_right_shift(bi, 1);
+      xi = bi;
+      eval_multiply(a_xi, a1, xi);
+      eval_subtract(b0, b0, a_xi);
+      eval_right_shift(b0, 1);
+      eval_left_shift(x, 1);
+      eval_add(x, xi);
    }
-   eval_bit_set(X, k);
-   X.const_time_unpoison();
-   return X;
-}
-*/
 
-/*
-template <typename Backend, expression_template_option ExpressionTemplates>
-number<Backend, ExpressionTemplates> inverse_mod_pow2(
-    const number<Backend, ExpressionTemplates>& a1, size_t k)
-{
-   return number<Backend, ExpressionTemplates>(
-       eval_inverse_mod_pow2(a1.backend(), k.backend()));
+   return x;
 }
-*/
 
 /*
 template <typename Backend>
